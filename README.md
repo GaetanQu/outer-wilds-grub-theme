@@ -24,8 +24,10 @@ Translations are generated using google translate, if you see a problem, feel fr
     bash install.sh
     ```
   - Optional: edit the boot menu entries to make it centered horizontally and add the selectors (it should look like "⠀⠀⠀>Name<")
-      - either edit the grub.cfg manually or use the renameEntries.sh script
-      - I partially vibecoded the renameEntries script, my bash knowledge is too limited to do it on my own so if you don't trust it just edit the grub.cfg manually
+    - either edit `/boot/grub/grub.cfg` manually or use the renameEntries.sh script
+    - I partially vibecoded the renameEntries script, my bash knowledge is too limited to do it on my own so if you don't trust it just edit the grub.cfg manually
+  - You might also want to edit `/boot/grub/themes/outer-wilds-grub-theme/theme.txt` to center the menu vertically
+    - Do this by modifying the number added to the `top` attribute of the `boot_menu` component
 
 
 <br>
