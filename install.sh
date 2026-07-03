@@ -50,50 +50,6 @@ declare -A INSTALLER_LANGS=(
     [Ukrainian]=UA
 )
 
-if [[ ${1:-} == "--lang" && -v 2 && -v INSTALLER_LANGS[$2] ]]; then
-    INSTALLER_LANG=$2
-else
-    INSTALLER_LANG_NAMES=($(echo ${!INSTALLER_LANGS[*]} | tr ' ' '\n' | sort -n))
-
-    PS3='Please select language #: '
-    select l in "${INSTALLER_LANG_NAMES[@]}"; do
-        if [[ -v INSTALLER_LANGS[$l] ]]; then
-            INSTALLER_LANG=$l
-            break
-        else
-            echo 'No such language, try again'
-        fi
-    done < /dev/tty
-fi
-
-
-if [[ "$INSTALLER_LANG" != "English" ]]; then
-    echo "Changing language to ${INSTALLER_LANG}"
-    sed -i -r -e '/^\s+# EN$/{n;s/^(\s*)/\1# /}' \
-              -e '/^\s+# '"${INSTALLER_LANGS[$INSTALLER_LANG]}"'$/{n;s/^(\s*)#\s*/\1/}' theme.txt
-fi
-
-echo ''
-
-# Choose resolution preset
-PS3='Please select resolution #: '
-options=("1080p" "1440p")
-select opt in "${options[@]}"
-do
-    case $opt in 
-        "1080p")
-            FILES_FOLDER="theme-files-1080p"
-            break
-            ;;
-        "1440p")
-            FILES_FOLDER="theme-files-1440p"
-            break
-            ;;
-        *) echo "invalid option $REPLY";;
-    esac
-done
-
-
 # Detect distro and set GRUB location and update method
 GRUB_DIR='grub'
 UPDATE_GRUB=''
@@ -133,6 +89,50 @@ if [[ -e /etc/os-release ]]; then
         fi
     fi
 fi
+
+# Choose resolution preset
+PS3='Please select resolution #: '
+options=("1080p" "1440p")
+select opt in "${options[@]}"
+do
+    case $opt in 
+        "1080p")
+            FILES_FOLDER="theme-files-1080p"
+            break
+            ;;
+        "1440p")
+            FILES_FOLDER="theme-files-1440p"
+            break
+            ;;
+        *) echo "invalid option $REPLY";;
+    esac
+done
+
+if [[ ${1:-} == "--lang" && -v 2 && -v INSTALLER_LANGS[$2] ]]; then
+    INSTALLER_LANG=$2
+else
+    INSTALLER_LANG_NAMES=($(echo ${!INSTALLER_LANGS[*]} | tr ' ' '\n' | sort -n))
+
+    PS3='Please select language #: '
+    select l in "${INSTALLER_LANG_NAMES[@]}"; do
+        if [[ -v INSTALLER_LANGS[$l] ]]; then
+            INSTALLER_LANG=$l
+            break
+        else
+            echo 'No such language, try again'
+        fi
+    done < /dev/tty
+fi
+
+
+if [[ "$INSTALLER_LANG" != "English" ]]; then
+    echo "Changing language to ${INSTALLER_LANG}"
+    sed -i -r -e '/^\s+# EN$/{n;s/^(\s*)/\1# /}' \
+              -e '/^\s+# '"${INSTALLER_LANGS[$INSTALLER_LANG]}"'$/{n;s/^(\s*)#\s*/\1/}' $FILES_FOLDER/theme.txt
+fi
+
+echo ''
+
 
 echo 'Creating GRUB themes directory'
 sudo rm -rf  /boot/${GRUB_DIR}/themes/${GRUB_THEME}
